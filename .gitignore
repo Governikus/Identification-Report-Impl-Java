@@ -7,3 +7,7 @@ target
 *.iml
 .idea
 .cache
+
+Jenkinsfile
+Jenkinsfile-rb
+Jenkinsfile-release
