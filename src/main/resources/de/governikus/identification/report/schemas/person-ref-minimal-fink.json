@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/Governikus/IdReport-SubjectRefSchemas/2.0.0/fink/person-ref-minimal-fink.json",
+    "type": "object",
+    "title": "FINK",
+    "description": "Minimal dataset used for FINK",
+    "default": {},
+    "additionalProperties": false,
+    "properties": {
+        "givenName": {
+            "type": "string",
+            "default": "",
+            "examples": [
+                "Max"
+            ]
+        },
+        "familyName": {
+            "type": "string",
+            "default": "",
+            "examples": [
+                "Mustermann"
+            ]
+        }
+    }
+}

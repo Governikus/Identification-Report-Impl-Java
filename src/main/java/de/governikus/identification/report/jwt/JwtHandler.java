@@ -117,10 +117,6 @@ public class JwtHandler
         switch (keyLength)
         {
           case 256:
-            if (((ECPublicKey)certificate.getPublicKey()).getParams().toString().startsWith("secp256k1"))
-            {
-              return JWSAlgorithm.ES256K;
-            }
             return JWSAlgorithm.ES256;
           case 384:
             return JWSAlgorithm.ES384;
