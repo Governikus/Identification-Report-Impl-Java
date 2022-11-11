@@ -97,7 +97,7 @@
         <version.maven.versions.plugin>2.12.0</version.maven.versions.plugin>
         <version.maven.surefire.plugin>3.0.0-M7</version.maven.surefire.plugin>
         <version.maven.deploy.plugin>3.0.0</version.maven.deploy.plugin>
-        <version.maven.release.plugin>2.5.3</version.maven.release.plugin>
+        <version.maven.release.plugin>3.0.0-M7</version.maven.release.plugin>
         <version.maven.enforcer.plugin>3.1.0</version.maven.enforcer.plugin>
         <version.maven.formatter.plugin>2.19.0</version.maven.formatter.plugin>
         <version.maven.source.plugin>3.2.1</version.maven.source.plugin>
@@ -261,7 +261,7 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
 
         <pluginManagement>
             <plugins>
@@ -270,7 +270,6 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${version.maven.deploy.plugin}</version>
                     <configuration>
-                        <deployAtEnd>true</deployAtEnd>
                     </configuration>
                 </plugin>
 
@@ -285,6 +284,10 @@
                         <mavenExecutorId>forked-path</mavenExecutorId>
                         <waitBeforeTagging>2</waitBeforeTagging> <!-- for review-board -->
                         <arguments>-DprepareAndPerformRelease</arguments>
+                        <!-- workaround for a bug that causes the source-jar to be uploaded twice
+                             @see: https://stackoverflow.com/questions/4251488/maven-release-plugin-fails-source-artifacts-getting-deployed-twice -->
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <lineSeparator>lf</lineSeparator>
                     </configuration>
                 </plugin>
             </plugins>
