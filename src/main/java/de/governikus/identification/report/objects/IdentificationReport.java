@@ -232,7 +232,7 @@ public class IdentificationReport<T extends SubjectRef>
   @JsonIgnore
   public OutputUnit getValidationResult()
   {
-    Optional.ofNullable(subjectRef).map(SubjectRef::validate);
+    Optional.ofNullable(subjectRef).ifPresent(SubjectRef::validate);
     return SchemaValidator.validateJsonObject(SchemaConstants.Locations.IDENTIFICATION_REPORT_SCHEMA_LOCATION,
                                               JsonObject.mapFrom(this));
   }
