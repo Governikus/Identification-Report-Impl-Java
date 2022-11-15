@@ -1,4 +1,5 @@
 .hg
+.hgtags
 .hgignore
 target
 .classpath
@@ -11,3 +12,4 @@ target
 Jenkinsfile
 Jenkinsfile-rb
 Jenkinsfile-release
+
