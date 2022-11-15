@@ -57,7 +57,6 @@ If the project does not compile within your IDE install the "lombok" plugin for 
 - [x] JSON Schema validation of the Identification Report
 - [x] Conversion of Identification Reports into and from JWT
   - [x] JWS
-  - [x] JWE
   - [x] Supported Key Types: `RSA` and `EC`
 - [x] easy conversion from and into strings
 
