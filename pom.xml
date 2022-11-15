@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.governikus</groupId>
     <artifactId>identification-report-impl-java</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>Identification Report Implementation</name>
     <description>The identification report is a JSON structure used to identify natural or legal persons in government
@@ -32,7 +31,7 @@
 
     <scm>
         <connection>${scm.repository}/Infrastruktur/maven/${project.artifactId}</connection>
-        <tag>identification-report-impl-java</tag>
+        <tag>1.0.0</tag>
         <url>https://hg.govkg.de/Infrastruktur/maven/${project.artifactId}</url>
     </scm>
 
@@ -348,8 +347,8 @@
                             <message>No Snapshots Allowed on release!</message>
                             <onlyWhenRelease>true</onlyWhenRelease>
                         </requireReleaseDeps>
-                        <banDuplicatePomDependencyVersions/>
-                        <dependencyConvergence/>
+                        <banDuplicatePomDependencyVersions />
+                        <dependencyConvergence />
                     </rules>
                 </configuration>
             </plugin>
