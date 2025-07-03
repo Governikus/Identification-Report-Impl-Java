@@ -1,11 +1,9 @@
 package de.governikus.identification.report.constants;
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.io.IOUtils;
+import java.util.Scanner;
 
 import de.governikus.identification.report.objects.subjects.EidCardPersonRef;
 import de.governikus.identification.report.objects.subjects.FinkPersonRefMinimal;
@@ -93,7 +91,12 @@ public final class SchemaConstants
 
     try (InputStream inputStream = SchemaValidator.class.getResourceAsStream(schemaLocation))
     {
-      jsonSchemaString = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+      if (inputStream == null)
+      {
+        throw new IllegalArgumentException("Schema not found in given location: " + schemaLocation);
+      }
+      Scanner s = new Scanner(inputStream).useDelimiter("\\A");
+      jsonSchemaString = s.hasNext() ? s.next() : "";
     }
     JsonObject object = new JsonObject(jsonSchemaString);
     JsonSchema schema = JsonSchema.of(object);

@@ -1,12 +1,10 @@
 package de.governikus.identification.report.objects.subjects;
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import org.apache.commons.io.IOUtils;
+import java.util.Scanner;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -74,7 +72,13 @@ public abstract class SubjectRef
     String schemaLocation = getSchemaLocation();
     try (InputStream inputStream = getClass().getResourceAsStream(schemaLocation))
     {
-      JsonObject jsonObject = new JsonObject(IOUtils.toString(inputStream, StandardCharsets.UTF_8));
+      if (inputStream == null)
+      {
+        throw new IllegalArgumentException("Schema not found in given location: " + schemaLocation);
+      }
+      Scanner s = new Scanner(inputStream).useDelimiter("\\A");
+      String jsonSchema = s.hasNext() ? s.next() : "";
+      JsonObject jsonObject = new JsonObject(jsonSchema);
       schemaId = jsonObject.getString("$id");
       TYPE_TO_SCHEMA_ID_MAP.put(getClass(), schemaId);
     }

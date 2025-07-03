@@ -1,9 +1,8 @@
 package de.governikus.identification.report.constants;
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -38,7 +37,8 @@ public class SchemaConstantsTest
     final String fileInput;
     try (InputStream inputStream = getClass().getResourceAsStream(fileLocation))
     {
-      fileInput = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+      Scanner s = new Scanner(inputStream).useDelimiter("\\A");
+      fileInput = s.hasNext() ? s.next() : "";
     }
     JsonObject schemaJson = new JsonObject(fileInput);
     Assertions.assertEquals(schemaJson.getString("$id"), schemaId);

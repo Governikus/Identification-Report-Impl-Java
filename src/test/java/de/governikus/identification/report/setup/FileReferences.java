@@ -2,13 +2,11 @@ package de.governikus.identification.report.setup;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 import java.util.function.Function;
-
-import org.apache.commons.io.IOUtils;
 
 import lombok.SneakyThrows;
 
@@ -54,7 +52,13 @@ public interface FileReferences
   {
     try (InputStream resourceInputStream = getClass().getResourceAsStream(resourcePath))
     {
-      String content = IOUtils.toString(resourceInputStream, StandardCharsets.UTF_8.name());
+      if (resourceInputStream == null)
+      {
+        throw new IllegalArgumentException("Resource not found in given location: " + resourcePath);
+      }
+      Scanner s = new Scanner(resourceInputStream).useDelimiter("\\A");
+
+      String content = s.hasNext() ? s.next() : "";
       if (changeResourceFileContent != null)
       {
         content = changeResourceFileContent.apply(content);

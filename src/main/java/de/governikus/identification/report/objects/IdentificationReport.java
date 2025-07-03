@@ -1,6 +1,7 @@
 package de.governikus.identification.report.objects;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -273,5 +274,33 @@ public class IdentificationReport<T extends SubjectRef>
   public String toString()
   {
     return toJson().encode();
+  }
+
+  /**
+   * Get the report time truncated to milliseconds
+   *
+   * @return report time with milliseconds
+   */
+  public Instant getReportTime()
+  {
+    if (reportTime == null)
+    {
+      return null;
+    }
+    return reportTime.truncatedTo(ChronoUnit.MILLIS);
+  }
+
+  /**
+   * Get the identification date truncated to milliseconds
+   *
+   * @return report time with milliseconds
+   */
+  public Instant getIdentificationTime()
+  {
+    if (identificationTime == null)
+    {
+      return null;
+    }
+    return identificationTime.truncatedTo(ChronoUnit.MILLIS);
   }
 }
