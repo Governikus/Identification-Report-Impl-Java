@@ -1,98 +1,89 @@
 package de.governikus.identification.report.validation;
 
-import java.util.Optional;
+import java.util.Locale;
+import java.util.Set;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.ExecutionConfig;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.ValidationMessage;
 
 import de.governikus.identification.report.constants.SchemaConstants;
-import io.vertx.core.json.JsonObject;
-import io.vertx.json.schema.Draft;
-import io.vertx.json.schema.JsonSchema;
-import io.vertx.json.schema.JsonSchemaOptions;
-import io.vertx.json.schema.OutputUnit;
-import io.vertx.json.schema.Validator;
+import de.governikus.identification.report.utils.ObjectMapperUtil;
 import lombok.extern.slf4j.Slf4j;
 
 
-/**
- * @author Pascal Knueppel
- * @since 28.10.2022
- */
 @Slf4j
 public class SchemaValidator
 {
 
-  /**
-   * reads the JSON schema from the given location and validates the json object against the given schema. This
-   * method will print the results from the validation on info-level.
-   *
-   * @param schemaLocation the schemas location that is used to validate the json object
-   * @param jsonObject the json object that should be validated
-   * @return true if the object matches the schemas definitions
-   */
-  public static boolean isJsonValid(String schemaLocation, JsonObject jsonObject)
-  {
-    OutputUnit result = validateJsonObject(schemaLocation, jsonObject);
-    Optional.ofNullable(result.getErrors()).ifPresent(errors -> errors.forEach(error -> log.info(error.toString())));
-    return result.getValid();
-  }
 
   /**
-   * reads the JSON schema from the given location and validates the json object against the given schema. This
-   * method will print the results from the validation on info-level.
+   * Validates a POJO against a JSON schema from the given location.
    *
    * @param schemaLocation the schemas location that is used to validate the json object
    * @param pojo the object that should be validated
-   * @return true if the object matches the schemas definitions
+   * @return true if the object matches the schema definitions
    */
   public static boolean isJsonValid(String schemaLocation, Object pojo)
   {
-    return isJsonValid(schemaLocation, JsonObject.mapFrom(pojo));
+    JsonNode node = ObjectMapperUtil.getObjectMapper().valueToTree(pojo);
+    return isJsonValid(schemaLocation, node);
   }
 
   /**
-   * reads the JSON schema from the given location and validates the json object against the given schema. This
-   * method can be used if the output-result from the validation API is directly needed. This might be necessary
-   * in cases if the object is validated only for a specific or if the errors should be logged in another way as
-   * the default.
+   * Validates a JsonNode against a JSON schema from the given location.
    *
    * @param schemaLocation the schemas location that is used to validate the json object
-   * @param pojo the json object representation that should be validated
-   * @return true if the object matches the schemas definitions
+   * @param jsonNode the json node to validate
+   * @return true if the object matches the schema definitions
    */
-  public static OutputUnit validateJsonObject(String schemaLocation, Object pojo)
+  public static boolean isJsonValid(String schemaLocation, JsonNode jsonNode)
   {
-    return validateJsonObject(schemaLocation, JsonObject.mapFrom(pojo));
+    Set<ValidationMessage> errors = validateJsonObject(schemaLocation, jsonNode);
+    errors.forEach(error -> log.info(error.getMessage()));
+    return errors.isEmpty();
   }
 
   /**
-   * reads the JSON schema from the given location and validates the json object against the given schema. This
-   * method can be used if the output-result from the validation API is directly needed. This might be necessary
-   * in cases if the object is validated only for a specific or if the errors should be logged in another way as
-   * the default.
+   * Validates a POJO and returns the set of validation messages.
    *
-   * @param schemaLocation the schemas location that is used to validate the json object
-   * @param jsonObject the json object that should be validated
-   * @return true if the object matches the schemas definitions
+   * @param schemaLocation the schemas location
+   * @param pojo the object to validate
+   * @return set of validation errors (empty if valid)
    */
-  public static OutputUnit validateJsonObject(String schemaLocation, JsonObject jsonObject)
+  public static Set<ValidationMessage> validateJsonObject(String schemaLocation, Object pojo)
+  {
+    JsonNode node = ObjectMapperUtil.getObjectMapper().valueToTree(pojo);
+    return validateJsonObject(schemaLocation, node);
+  }
+
+  /**
+   * Validates a JsonNode and returns the set of validation messages.
+   *
+   * @param schemaLocation the schemas location
+   * @param jsonNode the json node to validate
+   * @return set of validation errors (empty if valid)
+   */
+  public static Set<ValidationMessage> validateJsonObject(String schemaLocation, JsonNode jsonNode)
   {
     JsonSchema schema = SchemaConstants.getSchema(schemaLocation);
-    return validateJsonObject(schema, jsonObject);
+    return schema.validate(jsonNode, executionContext -> {
+      ExecutionConfig executionConfig = new ExecutionConfig();
+      executionConfig.setLocale(Locale.US);
+      executionContext.setExecutionConfig(executionConfig);
+    });
   }
 
   /**
-   * uses the given JSON schema to validate the json object. This method can be used if the output-result from
-   * the validation API is directly needed. This might be necessary in cases if the object is validated only for
-   * a specific or if the errors should be logged in another way as the default.
+   * Uses the given JSON schema to validate the json node.
    *
-   * @param schema used to validate the json object with the existing schema
-   * @param jsonObject the json object that should be validated
-   * @return true if the object matches the schemas definitions
+   * @param schema used to validate the json node with the existing schema
+   * @param jsonNode the json node that should be validated
+   * @return set of validation errors (empty if valid)
    */
-  public static OutputUnit validateJsonObject(JsonSchema schema, JsonObject jsonObject)
+  public static Set<ValidationMessage> validateJsonObject(JsonSchema schema, JsonNode jsonNode)
   {
-    return Validator.create(schema,
-                            new JsonSchemaOptions().setBaseUri("https://identification-report.de")
-                                                   .setDraft(Draft.DRAFT202012))
-                    .validate(jsonObject);
+    return schema.validate(jsonNode);
   }
 }

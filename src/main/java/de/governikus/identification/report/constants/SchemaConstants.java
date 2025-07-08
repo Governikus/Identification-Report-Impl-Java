@@ -5,21 +5,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.SpecVersion;
+
 import de.governikus.identification.report.objects.subjects.EidCardPersonRef;
 import de.governikus.identification.report.objects.subjects.FinkPersonRefMinimal;
 import de.governikus.identification.report.objects.subjects.SubjectRef;
-import de.governikus.identification.report.validation.SchemaValidator;
-import io.vertx.core.json.JsonObject;
-import io.vertx.json.schema.JsonSchema;
+import de.governikus.identification.report.utils.ObjectMapperUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
 
-/**
- * @author Pascal Knüppel
- * @since 06.11.2022
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SchemaConstants
 {
@@ -74,7 +73,7 @@ public final class SchemaConstants
   }
 
   /**
-   * reads the schema from the given location and stores it within a static map in order to prevent continuous
+   * Reads the schema from the given location and stores it within a static map in order to prevent continuous
    * parsing of the file
    *
    * @param schemaLocation the location of the schema file that should be retrieved as json schema instance
@@ -82,14 +81,14 @@ public final class SchemaConstants
   @SneakyThrows
   public static JsonSchema getSchema(String schemaLocation)
   {
-    final String jsonSchemaString;
     JsonSchema schemaOptional = SCHEMA_MAP.get(schemaLocation);
     if (schemaOptional != null)
     {
       return schemaOptional;
     }
 
-    try (InputStream inputStream = SchemaValidator.class.getResourceAsStream(schemaLocation))
+    final String jsonSchemaString;
+    try (InputStream inputStream = SchemaConstants.class.getResourceAsStream(schemaLocation))
     {
       if (inputStream == null)
       {
@@ -98,8 +97,9 @@ public final class SchemaConstants
       Scanner s = new Scanner(inputStream).useDelimiter("\\A");
       jsonSchemaString = s.hasNext() ? s.next() : "";
     }
-    JsonObject object = new JsonObject(jsonSchemaString);
-    JsonSchema schema = JsonSchema.of(object);
+    JsonNode node = ObjectMapperUtil.getObjectMapper().readTree(jsonSchemaString);
+    JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012);
+    JsonSchema schema = factory.getSchema(node);
 
     SCHEMA_MAP.put(schemaLocation, schema);
     return schema;

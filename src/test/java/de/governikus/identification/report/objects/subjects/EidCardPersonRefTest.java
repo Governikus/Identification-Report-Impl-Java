@@ -8,10 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import de.governikus.identification.report.constants.SchemaConstants;
 import de.governikus.identification.report.setup.FileReferences;
+import de.governikus.identification.report.utils.ObjectMapperUtil;
 import de.governikus.identification.report.validation.SchemaValidator;
-import io.vertx.core.json.JsonObject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,8 +68,8 @@ public class EidCardPersonRefTest implements FileReferences
                                                                                  .freeTextPlace("street 1")
                                                                                  .build())
                                                         .build();
-    JsonObject jsonObject = JsonObject.mapFrom(eidCardPersonRef);
-    Assertions.assertTrue(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, jsonObject));
+    JsonNode node = ObjectMapperUtil.getObjectMapper().valueToTree(eidCardPersonRef);
+    Assertions.assertTrue(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, node));
   }
 
   /**
@@ -87,8 +89,8 @@ public class EidCardPersonRefTest implements FileReferences
                                                                                  .noPlaceInfo("nowhere")
                                                                                  .build())
                                                         .build();
-    JsonObject jsonObject = JsonObject.mapFrom(eidCardPersonRef);
-    Assertions.assertTrue(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, jsonObject));
+    JsonNode node = ObjectMapperUtil.getObjectMapper().valueToTree(eidCardPersonRef);
+    Assertions.assertTrue(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, node));
   }
 
   /**
@@ -111,8 +113,8 @@ public class EidCardPersonRefTest implements FileReferences
                                                                                  .noPlaceInfo("nowhere")
                                                                                  .build())
                                                         .build();
-    JsonObject jsonObject = JsonObject.mapFrom(eidCardPersonRef);
-    Assertions.assertFalse(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, jsonObject));
+    JsonNode node = ObjectMapperUtil.getObjectMapper().valueToTree(eidCardPersonRef);
+    Assertions.assertFalse(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, node));
   }
 
   /**
@@ -138,8 +140,8 @@ public class EidCardPersonRefTest implements FileReferences
                                                                                  .freeTextPlace("somewhere")
                                                                                  .build())
                                                         .build();
-    JsonObject jsonObject = JsonObject.mapFrom(eidCardPersonRef);
-    Assertions.assertFalse(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, jsonObject));
+    JsonNode node = ObjectMapperUtil.getObjectMapper().valueToTree(eidCardPersonRef);
+    Assertions.assertFalse(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, node));
   }
 
   /**
@@ -157,8 +159,8 @@ public class EidCardPersonRefTest implements FileReferences
                                                         .placeOfBirth("Bremen")
                                                         .birthName("Liebmann")
                                                         .build();
-    JsonObject jsonObject = JsonObject.mapFrom(eidCardPersonRef);
-    Assertions.assertTrue(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, jsonObject));
+    JsonNode node = ObjectMapperUtil.getObjectMapper().valueToTree(eidCardPersonRef);
+    Assertions.assertTrue(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, node));
   }
 
   /**
@@ -186,9 +188,9 @@ public class EidCardPersonRefTest implements FileReferences
                                                         .build();
     Assertions.assertFalse(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION,
                                                        eidCardPersonRef));
-    JsonObject jsonObject = JsonObject.mapFrom(eidCardPersonRef);
-    Assertions.assertEquals("custom", jsonObject.getString("custom"));
-    Assertions.assertFalse(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, jsonObject));
+    JsonNode node = ObjectMapperUtil.getObjectMapper().valueToTree(eidCardPersonRef);
+    Assertions.assertEquals("custom", node.get("custom").asText());
+    Assertions.assertFalse(SchemaValidator.isJsonValid(SchemaConstants.Locations.EID_CARD_SCHEMA_LOCATION, node));
   }
 
   /**

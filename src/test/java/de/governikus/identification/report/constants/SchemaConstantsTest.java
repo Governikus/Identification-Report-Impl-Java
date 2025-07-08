@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import io.vertx.core.json.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import de.governikus.identification.report.utils.ObjectMapperUtil;
 import lombok.SneakyThrows;
 
 
@@ -40,8 +42,8 @@ public class SchemaConstantsTest
       Scanner s = new Scanner(inputStream).useDelimiter("\\A");
       fileInput = s.hasNext() ? s.next() : "";
     }
-    JsonObject schemaJson = new JsonObject(fileInput);
-    Assertions.assertEquals(schemaJson.getString("$id"), schemaId);
+    JsonNode schemaJson = ObjectMapperUtil.getObjectMapper().readTree(fileInput);
+    Assertions.assertEquals(schemaJson.get("$id").asText(), schemaId);
   }
 
 }

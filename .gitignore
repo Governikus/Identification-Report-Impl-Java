@@ -1,15 +1,19 @@
-.hg
-.hgtags
+target/
+*Jenkinsfile*
+.hg/
 .hgignore
-target
-.classpath
-.settings
-.project
+.hgtags
+/helm/
+commitToGit.py
+
+
+# IntelliJ project files
 *.iml
-.idea
-.cache
+*.iws
+*.ipr
+.idea/
 
-Jenkinsfile
-Jenkinsfile-rb
-Jenkinsfile-release
+*/_build
 
+# direnv for linux users
+.envrc
