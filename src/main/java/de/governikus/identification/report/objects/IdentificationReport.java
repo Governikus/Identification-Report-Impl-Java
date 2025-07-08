@@ -12,14 +12,13 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.governikus.identification.report.constants.SchemaConstants;
 import de.governikus.identification.report.objects.subjects.SubjectRef;
-import de.governikus.identification.report.utils.Utilities;
+import de.governikus.identification.report.utils.ObjectMapperUtil;
 import de.governikus.identification.report.validation.SchemaValidator;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.json.jackson.DatabindCodec;
-import io.vertx.json.schema.OutputUnit;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -108,7 +107,7 @@ public class IdentificationReport<T extends SubjectRef>
   /**
    * This element can contain references to documents including their hashes. This is an optional attribut.
    */
-  private List<JsonObject> documentReferences;
+  private List<ObjectNode> documentReferences;
 
   /**
    * additional elements that should be added to the json structure
@@ -129,43 +128,49 @@ public class IdentificationReport<T extends SubjectRef>
   @SneakyThrows
   public static IdentificationReport<? extends SubjectRef> fromJson(String json)
   {
-    JsonObject jsonObject = new JsonObject(json);
-    return fromJson(jsonObject);
+    JsonNode node = ObjectMapperUtil.getObjectMapper().readTree(json);
+    return fromJson(node);
   }
 
   /**
    * will parse the given json string into an identification report with an internal {@link #subjectRef} that is
    * determined automatically by the inline value of {@link #subjectRefType}
    *
-   * @param jsonObject the json object to parse evaluating the value of {@link #subjectRefType}
+   * @param jsonNode the json object to parse evaluating the value of {@link #subjectRefType}
    * @return the representational identification report
    */
   @JsonIgnore
   @SneakyThrows
-  public static <R extends SubjectRef> IdentificationReport<R> fromJson(JsonObject jsonObject)
+  public static <R extends SubjectRef> IdentificationReport<R> fromJson(JsonNode jsonNode)
   {
     final String subjectRefKey = "subjectRef";
     final String subjectRefTypeKey = "subjectRefType";
 
-    String subjectRefType = jsonObject.getString(subjectRefTypeKey);
+    // 1. Determine the subjectRef type using the schema id
+    String subjectRefType = jsonNode.has(subjectRefTypeKey) ? jsonNode.get(subjectRefTypeKey).asText() : null;
     Class<R> type = (Class<R>)SchemaConstants.getSubType(subjectRefType);
-    JsonObject subjectRefJson = jsonObject.getJsonObject(subjectRefKey);
+
+    JsonNode subjectRefJson = jsonNode.get(subjectRefKey);
+
     if (type == null && subjectRefJson != null)
     {
-      throw new IllegalStateException(String.format("Unregistered schema with id '%s' found. Register the schema "
-                                                    + "first with its corresponding subtype.",
+      throw new IllegalStateException(String.format("Unregistered schema with id '%s' found. Register the schema first with its corresponding subtype.",
                                                     subjectRefType));
     }
-    jsonObject.remove(subjectRefKey);
-    IdentificationReport<R> identificationReport = DatabindCodec.mapper()
-                                                                .readValue(jsonObject.toString(),
-                                                                           IdentificationReport.class);
+
+    // 2. Remove subjectRef from the main node before deserialization
+    ObjectNode copy = jsonNode.deepCopy();
+    copy.remove(subjectRefKey);
+
+    IdentificationReport<R> identificationReport = ObjectMapperUtil.getObjectMapper()
+                                                                   .treeToValue(copy, IdentificationReport.class);
+
     if (type == null)
     {
       return identificationReport;
     }
-    String subjectRefJsonValue = subjectRefJson.toString();
-    R subjectRef = DatabindCodec.mapper().readValue(subjectRefJsonValue, type);
+
+    R subjectRef = ObjectMapperUtil.getObjectMapper().treeToValue(subjectRefJson, type);
     identificationReport.setSubjectRef(subjectRef);
     return identificationReport;
   }
@@ -184,15 +189,15 @@ public class IdentificationReport<T extends SubjectRef>
   @SneakyThrows
   public static <T extends SubjectRef> IdentificationReport<T> fromJson(String json, Class<T> subjectRefType)
   {
-    JsonObject jsonObject = new JsonObject(json);
-    return fromJson(jsonObject, subjectRefType);
+    JsonNode node = ObjectMapperUtil.getObjectMapper().readTree(json);
+    return fromJson(node, subjectRefType);
   }
 
   /**
    * will parse the given json string into an identification report with an internal {@link #subjectRef} of the
    * given type
    *
-   * @param jsonObject the json object to parse
+   * @param jsonNode the json object to parse
    * @param subjectRefType the type of the {@link #subjectRef}. This should be possible to determine by
    *          evaluating the value of {@link #subjectRefType}
    * @return the representational identification report
@@ -200,15 +205,22 @@ public class IdentificationReport<T extends SubjectRef>
    */
   @JsonIgnore
   @SneakyThrows
-  public static <T extends SubjectRef> IdentificationReport<T> fromJson(JsonObject jsonObject, Class<T> subjectRefType)
+  public static <T extends SubjectRef> IdentificationReport<T> fromJson(JsonNode jsonNode, Class<T> subjectRefType)
   {
     final String subjectRefKey = "subjectRef";
-    String subjectRefJson = jsonObject.getJsonObject(subjectRefKey).toString();
-    T subjectRef = DatabindCodec.mapper().readValue(subjectRefJson, subjectRefType);
-    jsonObject.remove(subjectRefKey);
-    IdentificationReport<T> identificationReport = DatabindCodec.mapper()
-                                                                .readValue(jsonObject.toString(),
-                                                                           IdentificationReport.class);
+
+    // Extract and deserialize the subjectRef
+    JsonNode subjectRefNode = jsonNode.get(subjectRefKey);
+    T subjectRef = ObjectMapperUtil.getObjectMapper().treeToValue(subjectRefNode, subjectRefType);
+
+    // Remove subjectRef from the main node before deserialization
+    ObjectNode copy = jsonNode.deepCopy();
+    copy.remove(subjectRefKey);
+
+    // Deserialize the rest of the IdentificationReport
+    IdentificationReport<T> identificationReport = ObjectMapperUtil.getObjectMapper()
+                                                                   .treeToValue(copy, IdentificationReport.class);
+
     identificationReport.setSubjectRef(subjectRef);
     return identificationReport;
   }
@@ -220,31 +232,18 @@ public class IdentificationReport<T extends SubjectRef>
    */
   public boolean validate()
   {
-    OutputUnit outputUnit = getValidationResult();
-    Utilities.logErrors(outputUnit);
-    return outputUnit.getValid();
-  }
-
-  /**
-   * executes a schema validation on this object and returns the result of the validation
-   *
-   * @return the validation result
-   */
-  @JsonIgnore
-  public OutputUnit getValidationResult()
-  {
     Optional.ofNullable(subjectRef).ifPresent(SubjectRef::validate);
-    return SchemaValidator.validateJsonObject(SchemaConstants.Locations.IDENTIFICATION_REPORT_SCHEMA_LOCATION,
-                                              JsonObject.mapFrom(this));
+    return SchemaValidator.isJsonValid(SchemaConstants.Locations.IDENTIFICATION_REPORT_SCHEMA_LOCATION,
+                                       ObjectMapperUtil.getObjectMapper().valueToTree(this));
   }
 
   /**
    * will parse instance into its json string representation
    */
   @JsonIgnore
-  public JsonObject toJson()
+  public JsonNode toJson()
   {
-    return JsonObject.mapFrom(this);
+    return ObjectMapperUtil.getObjectMapper().valueToTree(this);
   }
 
   /**
@@ -273,7 +272,7 @@ public class IdentificationReport<T extends SubjectRef>
   @Override
   public String toString()
   {
-    return toJson().encode();
+    return toJson().toString();
   }
 
   /**

@@ -3,6 +3,7 @@ package de.governikus.identification.report.objects;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.hamcrest.MatcherAssert;
@@ -13,13 +14,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.networknt.schema.ValidationMessage;
+
 import de.governikus.identification.report.constants.SchemaConstants;
 import de.governikus.identification.report.objects.subjects.EidCardPersonRef;
 import de.governikus.identification.report.objects.subjects.SubjectRef;
 import de.governikus.identification.report.setup.FileReferences;
+import de.governikus.identification.report.utils.ObjectMapperUtil;
 import de.governikus.identification.report.validation.SchemaValidator;
-import io.vertx.core.json.JsonObject;
-import io.vertx.json.schema.OutputUnit;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +44,7 @@ public class IdentificationReportTest implements FileReferences
   @ValueSource(strings = {IDENTIFICATION_REPORT_2_0, IDENTIFICATION_REPORT_WITH_EID_CARD_SUBJECT_2_0})
   public void testVerifyWithAndWithoutSubjects(String reportLocation)
   {
-    JsonObject resource = new JsonObject(readResourceFile(reportLocation));
+    JsonNode resource = ObjectMapperUtil.getObjectMapper().readTree(readResourceFile(reportLocation));
     Assertions.assertTrue(SchemaValidator.isJsonValid(SchemaConstants.Locations.IDENTIFICATION_REPORT_SCHEMA_LOCATION,
                                                       resource));
   }
@@ -54,16 +58,15 @@ public class IdentificationReportTest implements FileReferences
     IdentificationReport<EidCardPersonRef> identificationReport = IdentificationReport.<EidCardPersonRef> builder()
                                                                                       .build();
 
-    JsonObject resource = identificationReport.toJson();
+    JsonNode resource = identificationReport.toJson();
 
-    OutputUnit result = SchemaValidator.validateJsonObject(SchemaConstants.Locations.IDENTIFICATION_REPORT_SCHEMA_LOCATION,
-                                                           resource);
+    Set<ValidationMessage> result = SchemaValidator.validateJsonObject(SchemaConstants.Locations.IDENTIFICATION_REPORT_SCHEMA_LOCATION,
+                                                                       resource);
 
-    Assertions.assertFalse(result.getValid(), result.getError());
-    Assertions.assertEquals(5, result.getErrors().size());
-    for ( OutputUnit error : result.getErrors() )
+    Assertions.assertEquals(5, result.size());
+    for ( ValidationMessage error : result )
     {
-      Assertions.assertEquals("required", error.getKeyword());
+      Assertions.assertTrue(error.getError().contains("required property"));
     }
   }
 
@@ -74,13 +77,12 @@ public class IdentificationReportTest implements FileReferences
   @Test
   public void testCustomPropertyInDocumentReferenceAdded()
   {
-    // @formatter:off
-    JsonObject documentReference = JsonObject.of("documentId", UUID.randomUUID().toString(),
-                                                 "documentName", "test.pdf",
-                                                 "customField", "unwanted property");
-    // @formatter:on
+    ObjectNode documentReference = ObjectMapperUtil.getObjectMapper().createObjectNode();
+    documentReference.put("documentId", UUID.randomUUID().toString());
+    documentReference.put("documentName", "test.pdf");
+    documentReference.put("customField", "unwanted property");
 
-    List<JsonObject> documentReferenceList = new ArrayList<>();
+    List<ObjectNode> documentReferenceList = new ArrayList<>();
     documentReferenceList.add(documentReference);
     IdentificationReport identificationReport = IdentificationReport.builder()
                                                                     .reportId(UUID.randomUUID().toString())
@@ -90,18 +92,15 @@ public class IdentificationReportTest implements FileReferences
                                                                     .levelOfAssurance(LevelOfAssurance.EIDAS_LOW)
                                                                     .documentReferences(documentReferenceList)
                                                                     .build();
-    JsonObject resource = identificationReport.toJson();
+    JsonNode resource = identificationReport.toJson();
 
-    OutputUnit result = SchemaValidator.validateJsonObject(SchemaConstants.Locations.IDENTIFICATION_REPORT_SCHEMA_LOCATION,
-                                                           resource);
+    Set<ValidationMessage> result = SchemaValidator.validateJsonObject(SchemaConstants.Locations.IDENTIFICATION_REPORT_SCHEMA_LOCATION,
+                                                                       resource);
 
-    Assertions.assertFalse(result.getValid(), result.getError());
-    Assertions.assertTrue(result.getErrors()
-                                .stream()
-                                .anyMatch(error -> error.getInstanceLocation().endsWith("documentReferences")));
-    Assertions.assertTrue(result.getErrors()
-                                .stream()
-                                .anyMatch(error -> error.getInstanceLocation().endsWith("customField")));
+    Assertions.assertFalse(result.isEmpty());
+    Assertions.assertTrue(result.stream()
+                                .anyMatch(error -> error.getInstanceLocation().contains("documentReferences")));
+    Assertions.assertTrue(result.stream().anyMatch(error -> error.getProperty().contains("customField")));
   }
 
   /**
@@ -118,9 +117,10 @@ public class IdentificationReportTest implements FileReferences
               "http://bsi.bund.de/eID/LoA/normal,BSI_EID_LOW", "unknown,UNKNOWN", ",UNKNOWN"})
   public void testLevelOfAssuranceIsDeserializable(String levelOfAssuranceValue, LevelOfAssurance expectedEnumValue)
   {
-    JsonObject jsonObject = JsonObject.of("levelOfAssurance", levelOfAssuranceValue);
+    ObjectNode jsonObject = ObjectMapperUtil.getObjectMapper().createObjectNode();
+    jsonObject.put("levelOfAssurance", levelOfAssuranceValue);
     IdentificationReport identificationReport = Assertions.assertDoesNotThrow(() -> {
-      return IdentificationReport.fromJson(jsonObject.encode());
+      return IdentificationReport.fromJson(jsonObject.toString());
     });
     Assertions.assertEquals(expectedEnumValue, identificationReport.getLevelOfAssurance());
   }
@@ -128,6 +128,7 @@ public class IdentificationReportTest implements FileReferences
   /**
    * makes sure that the subjectRef is correctly translated into the given type if set into the parser method
    */
+  @SneakyThrows
   @ParameterizedTest
   // @formatter:off
   @CsvSource({IDENTIFICATION_REPORT_2_0
@@ -142,11 +143,12 @@ public class IdentificationReportTest implements FileReferences
                                                                                      Class<T> expectecClassType)
   {
     final String json = readResourceFile(jsonLocation);
-    JsonObject jsonObject = new JsonObject(json);
-    jsonObject.put("subjectRefType", subjectRefType);
+    JsonNode jsonObject = ObjectMapperUtil.getObjectMapper().readTree(json);
+    ObjectNode copy = jsonObject.deepCopy();
+    copy.put("subjectRefType", subjectRefType);
 
     IdentificationReport<T> identificationReport = Assertions.assertDoesNotThrow(() -> {
-      return (IdentificationReport<T>)IdentificationReport.fromJson(jsonObject.toString());
+      return (IdentificationReport<T>)IdentificationReport.fromJson(copy.toString());
     });
     MatcherAssert.assertThat(identificationReport.getSubjectRef().getClass(),
                              Matchers.typeCompatibleWith(expectecClassType));

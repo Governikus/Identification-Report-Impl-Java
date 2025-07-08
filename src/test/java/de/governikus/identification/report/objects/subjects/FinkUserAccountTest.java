@@ -21,7 +21,7 @@ public class FinkUserAccountTest
                                                               .givenName("Max")
                                                               .familyName("Mustermann")
                                                               .build();
-    Assertions.assertTrue(authentication.validate().getValid());
+    Assertions.assertTrue(authentication.validate());
   }
 
   /**

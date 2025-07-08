@@ -9,11 +9,10 @@ import java.util.Scanner;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import de.governikus.identification.report.utils.Utilities;
+import de.governikus.identification.report.utils.ObjectMapperUtil;
 import de.governikus.identification.report.validation.SchemaValidator;
-import io.vertx.core.json.JsonObject;
-import io.vertx.json.schema.OutputUnit;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
@@ -78,8 +77,8 @@ public abstract class SubjectRef
       }
       Scanner s = new Scanner(inputStream).useDelimiter("\\A");
       String jsonSchema = s.hasNext() ? s.next() : "";
-      JsonObject jsonObject = new JsonObject(jsonSchema);
-      schemaId = jsonObject.getString("$id");
+      JsonNode node = ObjectMapperUtil.getObjectMapper().reader().readTree(jsonSchema);
+      schemaId = node.get("$id").asText();
       TYPE_TO_SCHEMA_ID_MAP.put(getClass(), schemaId);
     }
     return schemaId;
@@ -89,10 +88,8 @@ public abstract class SubjectRef
    * validates this subtype against its corresponding schema definition
    */
   @JsonIgnore
-  public OutputUnit validate()
+  public boolean validate()
   {
-    OutputUnit outputUnit = SchemaValidator.validateJsonObject(getSchemaLocation(), JsonObject.mapFrom(this));
-    Utilities.logErrors(outputUnit);
-    return outputUnit;
+    return SchemaValidator.isJsonValid(getSchemaLocation(), ObjectMapperUtil.getObjectMapper().valueToTree(this));
   }
 }

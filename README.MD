@@ -25,23 +25,18 @@ The supported `subjectRef`-types can be manually extended without changing the A
 
 ---
 
-**This project requires JDK 8 or higher**
+**This project requires JDK 17 or higher**
 
 Please note that some Elliptic Curve algorithms will require at least JDK 11.
 
+The library is available on maven central, just include it in your project like so:
+
 ```xml
 
-<repositories>
-    <repository>
-        <id>nexus-ext-governikus</id>
-        <url>https://nexus-ext.governikus.de/nexus/content/groups/public/</url>
-    </repository>
-</repositories>
-
 <dependency>
-<groupId>de.governikus</groupId>
-<artifactId>identification-report-impl-java</artifactId>
-<version>${project.version}</version>
+    <groupId>de.governikus</groupId>
+    <artifactId>identification-report-impl-java</artifactId>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -157,7 +152,6 @@ IdentificationReport<EidCardPersonRef> identificationReport =
                                               .documentReferences(documentReferenceList)
                                               .build();
 boolean isValid = identificationReport.validate();
-OutputUnit outputUnit = identificationReport.getValidationResult();
 ```
 
 ### Parse from String

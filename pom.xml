@@ -4,7 +4,7 @@
 
     <groupId>de.governikus</groupId>
     <artifactId>identification-report-impl-java</artifactId>
-    <version>1.0.1</version>
+    <version>2.0.0</version>
 
     <name>Identification Report Implementation</name>
     <description>The identification report is a JSON structure used to identify natural or legal persons in government
@@ -21,83 +21,83 @@
 
     <developers>
         <developer>
-            <id>knueppel</id>
-            <name>Pascal Knüppel</name>
-            <roles>
-                <role>developer</role>
-            </roles>
+            <name>Governikus</name>
+            <email>autent@governikus.de</email>
+            <organization>Governikus</organization>
+            <url>https://www.governikus.de</url>
         </developer>
     </developers>
 
     <scm>
-        <connection>${scm.repository}/Infrastruktur/maven/${project.artifactId}</connection>
-        <tag>identification-report-impl-java-1.0.1</tag>
-        <url>https://hg.govkg.de/Infrastruktur/maven/${project.artifactId}</url>
+        <!-- When preparing a release, add -DscmConnection=scm:git:... -->
+        <connection>${scmConnection}</connection>
+        <tag>identification-report-impl-java-2.0.0</tag>
+        <url>https://github.com/Governikus/Identification-Report-Impl-Java</url>
     </scm>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>nexus-ext-governikus</id>
-            <url>https://nexus-ext.governikus.de/nexus/content/repositories/Public-Libraries-Snapshots/</url>
-        </snapshotRepository>
-
-        <repository>
-            <id>nexus-ext-governikus</id>
-            <url>https://nexus-ext.governikus.de/nexus/content/repositories/Public-Libraries/</url>
-        </repository>
-    </distributionManagement>
-
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
+        <!-- Maven version -->
+        <maven.minimum.version>3.5.4</maven.minimum.version>
+
+        <!-- Encodings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <scm.url>https://scm.govkg.de</scm.url>
-        <scm.repository>scm:hg:${scm.url}</scm.repository>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Sonar/Reporting settings -->
         <sonar.java.source>${maven.compiler.source}</sonar.java.source>
         <sonar.junit.reportPaths>${project.build.directory}/surefire-reports</sonar.junit.reportPaths>
+
+        <!-- the surefire ${argLine} property, use for ${jacoco.agent.argLine} property in the coverage profile  -->
+        <argLineTestExec>-Xmx1024m</argLineTestExec>
+
         <!-- Tells Sonar where the dependency-check report file is located, for
 			the dependency-check-sonar-plugin https://github.com/stevespringett/dependency-check-sonar-plugin -->
-        <sonar.dependencyCheck.reportPath>
-            ${project.build.directory}/dependency-check-report.xml
+        <sonar.dependencyCheck.reportPath>${project.build.directory}/dependency-check-report.xml
         </sonar.dependencyCheck.reportPath>
-        <sonar.dependencyCheck.htmlReportPath>
-            ${project.build.directory}/dependency-check-report.html
+        <sonar.dependencyCheck.htmlReportPath>${project.build.directory}/dependency-check-report.html
         </sonar.dependencyCheck.htmlReportPath>
 
         <!-- dependency check properties -->
         <dependency-check-format>ALL</dependency-check-format>
-        <version.dependency-check.mariadb>2.7.6</version.dependency-check.mariadb>
+        <!--suppress UnresolvedMavenProperty -->
+        <formatter-path>${project.parent.basedir}</formatter-path>
+
+        <!-- Disable the JavaDoc DocLint feature that comes with Java8 and checks
+                the JavaDoc for errors and fail if some are found. -->
+        <doclint>none</doclint>
 
         <!--suppress UnresolvedMavenProperty -->
         <formatter-path>${project.basedir}</formatter-path>
 
-        <version.lombok>1.18.26</version.lombok>
+        <version.lombok>1.18.38</version.lombok>
 
-        <version.vertx-json-schema>4.3.8</version.vertx-json-schema>
-        <version.jackson>2.14.2</version.jackson>
-        <version.jackson.databind>2.14.2</version.jackson.databind>
-        <version.nimbus.jose.jwt>9.30.1</version.nimbus.jose.jwt>
+        <!-- business dependencies -->
+        <version.jackson>2.19.1</version.jackson>
+        <version.json-schema-validator>1.5.8</version.json-schema-validator>
+        <version.nimbus.jose.jwt>10.3.1</version.nimbus.jose.jwt>
 
         <!-- logging dependencies -->
-        <version.slf4j>2.0.6</version.slf4j>
+        <version.slf4j>2.0.17</version.slf4j>
 
         <!-- test dependencies -->
-        <version.junit.jupiter>5.9.2</version.junit.jupiter>
-        <version.hamcrest>2.2</version.hamcrest>
+        <version.junit.jupiter>5.13.3</version.junit.jupiter>
+        <version.hamcrest>3.0</version.hamcrest>
         <version.log4j2>2.19.0</version.log4j2>
 
         <!-- plugins -->
-        <version.maven.compiler.plugin>3.10.1</version.maven.compiler.plugin>
-        <version.maven.versions.plugin>2.14.2</version.maven.versions.plugin>
-        <version.maven.surefire.plugin>3.0.0-M8</version.maven.surefire.plugin>
-        <version.maven.deploy.plugin>3.1.0</version.maven.deploy.plugin>
-        <version.maven.release.plugin>3.0.0-M7</version.maven.release.plugin>
-        <version.maven.enforcer.plugin>3.2.1</version.maven.enforcer.plugin>
-        <version.maven.formatter.plugin>2.22.0</version.maven.formatter.plugin>
+        <version.maven.compiler.plugin>3.14.0</version.maven.compiler.plugin>
+        <version.maven-install-plugin>3.1.3</version.maven-install-plugin>
+        <version.maven-deploy-plugin>3.1.3</version.maven-deploy-plugin>
+        <version.maven-clean-plugin>3.4.0</version.maven-clean-plugin>
+        <version.maven.versions.plugin>2.18.0</version.maven.versions.plugin>
+        <version.maven-surefire-plugin>3.5.3</version.maven-surefire-plugin>
+        <version.maven.deploy.plugin>3.1.4</version.maven.deploy.plugin>
+        <version.maven-release-plugin>3.1.1</version.maven-release-plugin>
+        <version.maven.enforcer.plugin>3.6.0</version.maven.enforcer.plugin>
+        <version.maven.formatter.plugin>2.27.0</version.maven.formatter.plugin>
         <version.maven.source.plugin>3.2.1</version.maven.source.plugin>
         <version.maven.javadoc.plugin>3.4.1</version.maven.javadoc.plugin>
         <version.maven.lombok.plugin>1.18.20.0</version.maven.lombok.plugin>
@@ -105,7 +105,24 @@
         <version.maven.dependency.plugin>3.5.0</version.maven.dependency.plugin>
         <version.dependency.check.maven>8.0.2</version.dependency.check.maven>
         <version.maven.jacoco.plugin>0.8.8</version.maven.jacoco.plugin>
+        <version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
+        <version.maven-site-plugin>3.21.0</version.maven-site-plugin>
+        <version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
+        <version.maven-enforcer-plugin>3.5.0</version.maven-enforcer-plugin>
+        <version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
+        <version.extra-enforcer-rules>1.9.0</version.extra-enforcer-rules>
+        <version.maven-source-plugin>3.3.1</version.maven-source-plugin>
+        <version.maven-javadoc-plugin>3.11.2</version.maven-javadoc-plugin>
+        <version.sonar-jacoco-listeners>5.14.0.18788</version.sonar-jacoco-listeners>
+        <version.jacoco-maven-plugin>0.8.12</version.jacoco-maven-plugin>
+        <version.maven-gpg-plugin>3.2.7</version.maven-gpg-plugin>
+        <version.central-publishing-maven-plugin>0.7.0</version.central-publishing-maven-plugin>
 
+        <!-- check minimum require java version -->
+        <enforcer.minimum.requireJavaVersion>[${maven.compiler.target},)</enforcer.minimum.requireJavaVersion>
+        <!-- Ban snapshot versions for plugins per default. You can temporarily
+            enable them during development by overriding this property -->
+        <enforcer.banPluginSnapshots>true</enforcer.banPluginSnapshots>
     </properties>
 
     <dependencyManagement>
@@ -117,19 +134,19 @@
                 <version>${version.lombok}</version>
             </dependency>
             <dependency>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-json-schema</artifactId>
-                <version>${version.vertx-json-schema}</version>
+                <groupId>com.networknt</groupId>
+                <artifactId>json-schema-validator</artifactId>
+                <version>${version.json-schema-validator}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>${version.jackson.databind}</version>
+                <version>${version.jackson}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${version.jackson.databind}</version>
+                <version>${version.jackson}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -175,25 +192,10 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${version.log4j2}</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${version.slf4j}</version>
                 <scope>test</scope>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-api</artifactId>
-                <version>${version.log4j2}</version>
-                <scope>test</scope>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
-                <version>${version.log4j2}</version>
-                <scope>test</scope>
-                <optional>true</optional>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -204,42 +206,8 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-json-schema</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>netty-codec-http</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-codec-http2</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-common</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-handler</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-handler-proxy</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-resolver</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-resolver-dns</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>netty-transport</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -272,20 +240,12 @@
             <artifactId>hamcrest-library</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <artifactId>slf4j-simple</artifactId>
         </dependency>
     </dependencies>
 
@@ -295,29 +255,173 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <!-- http://maven.apache.org/plugins/maven-deploy-plugin/ -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>${version.maven.deploy.plugin}</version>
+                    <version>${version.maven-deploy-plugin}</version>
                     <configuration>
+                        <deployAtEnd>true</deployAtEnd>
                     </configuration>
                 </plugin>
 
                 <plugin>
+                    <!-- http://maven.apache.org/plugins/maven-resources-plugin/ -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${version.maven-resources-plugin}</version>
+                </plugin>
+                <plugin>
+                    <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${version.maven-compiler-plugin}</version>
+                </plugin>
+                <plugin>
+                    <!-- http://maven.apache.org/plugins/maven-jar-plugin/ -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${version.maven-jar-plugin}</version>
+                </plugin>
+                <plugin>
+                    <!-- http://maven.apache.org/enforcer/maven-enforcer-plugin/ -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${version.maven-enforcer-plugin}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>extra-enforcer-rules</artifactId>
+                            <version>${version.extra-enforcer-rules}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <plugin>
+                    <!-- http://maven.apache.org/maven-release/maven-release-plugin/ -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>${version.maven.release.plugin}</version>
-
+                    <version>${version.maven-release-plugin}</version>
+                    <inherited>true</inherited>
                     <configuration>
-                        <localCheckout>true</localCheckout>
-                        <pushChanges>false</pushChanges>
-                        <mavenExecutorId>forked-path</mavenExecutorId>
-                        <waitBeforeTagging>2</waitBeforeTagging> <!-- for review-board -->
+                        <!-- per our convention, all submodules must have the same version
+                            as the parent -->
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+
+                        <!-- prepareAndPerformRelease can be used as profile activation condition -->
                         <arguments>-DprepareAndPerformRelease</arguments>
-                        <!-- workaround for a bug that causes the source-jar to be uploaded twice
-                             @see: https://stackoverflow.com/questions/4251488/maven-release-plugin-fails-source-artifacts-getting-deployed-twice -->
-                        <useReleaseProfile>false</useReleaseProfile>
-                        <lineSeparator>lf</lineSeparator>
+
+                        <!-- for hg and git -->
+                        <remoteTagging>false</remoteTagging>
+                        <pushChanges>false</pushChanges> <!-- no auto push, better rollback -->
+                        <localCheckout>true</localCheckout> <!-- for git and hg -->
+                        <waitBeforeTagging>2</waitBeforeTagging> <!-- for review-board -->
                     </configuration>
+                </plugin>
+
+                <plugin>
+                    <!-- OWASP dependency-check http://jeremylong.github.io/DependencyCheck/index.html -->
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${version.dependency-check-maven}</version>
+                    <configuration>
+                        <skipProvidedScope>true</skipProvidedScope>
+                        <skipTestScope>true</skipTestScope>
+                        <skipRuntimeScope>false</skipRuntimeScope>
+                        <skipSystemScope>true</skipSystemScope>
+                        <format>${dependency-check-format}</format>
+                        <outputDirectory>${project.build.directory}</outputDirectory>
+                        <failOnError>false</failOnError>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <!-- http://maven.apache.org/surefire/maven-surefire-plugin/ -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${version.maven-surefire-plugin}</version>
+                    <inherited>true</inherited>
+                    <configuration>
+                        <runOrder>hourly</runOrder>
+                        <!-- alphabetical on even hours, reverse alphabetical on odd hours -->
+                        <forkMode>once</forkMode>
+                        <forkCount>1</forkCount>
+                        <!-- problem with reuse forks an jacoco : https://jira.sonarsource.com/browse/SONARJAVA-728 -->
+                        <reuseForks>true</reuseForks>
+                        <argLine>${argLineTestExec}</argLine>
+                        <skip>false</skip>
+                        <failIfNoTests>false</failIfNoTests>
+                        <excludes>
+                            <exclude>**/TestSuite*.*</exclude>
+                            <exclude>**/*TestSuite.*</exclude>
+                            <exclude>**/IT*.*</exclude>
+                            <exclude>**/*IT.*</exclude>
+                            <exclude>**/*IntegrationTest.*</exclude>
+                            <exclude>**/*SystemTest.*</exclude>
+                            <exclude>**/*PerformanceTest.*</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <!-- http://maven.apache.org/surefire/maven-surefire-report-plugin/ -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-report-plugin</artifactId>
+                    <version>${version.maven-surefire-plugin}</version>
+                </plugin>
+
+                <plugin>
+                    <!-- http://www.eclemma.org/jacoco/trunk/doc/maven.html -->
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${version.jacoco-maven-plugin}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${version.maven-source-plugin}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${version.maven-javadoc-plugin}</version>
+                </plugin>
+
+                <plugin>
+                    <!-- https://maven.apache.org/plugins/maven-clean-plugin/ -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${version.maven-clean-plugin}</version>
+                </plugin>
+
+                <plugin>
+                    <!-- https://maven.apache.org/plugins/maven-install-plugin/ -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${version.maven-install-plugin}</version>
+                    <configuration>
+                        <installAtEnd>true</installAtEnd>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <!-- http://maven.apache.org/plugins/maven-site-plugin/ -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${version.maven-site-plugin}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${version.maven-gpg-plugin}</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>${version.central-publishing-maven-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -325,64 +429,54 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${version.maven.compiler.plugin}</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-                <version>${version.maven.versions.plugin}</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${version.maven.surefire.plugin}</version>
-                <configuration>
-                    <!-- alphabetical on even hours, reverse alphabetical on odd hours -->
-                    <forkMode>once</forkMode>
-                    <forkCount>1</forkCount>
-                    <!-- problem with reuse forks an jacoco : https://jira.sonarsource.com/browse/SONARJAVA-728 -->
-                    <reuseForks>true</reuseForks>
-                    <skip>false</skip>
-                    <failIfNoTests>false</failIfNoTests>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>${version.maven.enforcer.plugin}</version>
                 <executions>
                     <execution>
-                        <id>enforce</id>
+                        <id>enforce-general-project-rules</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>${enforcer.minimum.requireJavaVersion}</version>
+                                </requireJavaVersion>
+
+                                <requireMavenVersion>
+                                    <version>[${maven.minimum.version},)</version>
+                                </requireMavenVersion>
+
+                                <requireProperty>
+                                    <property>project.groupId</property>
+                                    <regex>de\.governikus(\..+)?</regex>
+                                    <regexMessage>The groupId must start with de.governikus.</regexMessage>
+                                </requireProperty>
+
+                                <dependencyConvergence />
+
+                                <requirePluginVersions>
+                                    <message>Best Practice is to always define plugin versions!</message>
+                                    <banSnapshots>${enforcer.banPluginSnapshots}</banSnapshots>
+                                </requirePluginVersions>
+
+                                <requireReleaseDeps>
+                                    <onlyWhenRelease>true</onlyWhenRelease>
+                                    <message>No Snapshots Allowed!</message>
+                                </requireReleaseDeps>
+
+                                <reactorModuleConvergence>
+                                    <message>The reactor is not valid</message>
+                                </reactorModuleConvergence>
+
+                                <banDistributionManagement>
+                                    <allowSite>true</allowSite>
+                                </banDistributionManagement>
+
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <rules>
-                        <requireMavenVersion>
-                            <version>[3.3,)</version>
-                        </requireMavenVersion>
-
-                        <requireReleaseDeps>
-                            <message>No Snapshots Allowed on release!</message>
-                            <onlyWhenRelease>true</onlyWhenRelease>
-                        </requireReleaseDeps>
-                        <banDuplicatePomDependencyVersions />
-                        <dependencyConvergence />
-                    </rules>
-                </configuration>
             </plugin>
-
             <plugin>
                 <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
@@ -390,10 +484,6 @@
                 <configuration>
                     <configFile>${formatter-path}/formatter.xml</configFile>
                     <lineEnding>LF</lineEnding>
-                    <!-- delomboked sources do not conform to the formatter and use of the -->
-                    <!-- lombok plugin changes sourceDirectory and testSourceDirectory -->
-                    <sourceDirectory>src/main/java</sourceDirectory>
-                    <testSourceDirectory>src/test/java</testSourceDirectory>
                 </configuration>
                 <executions>
                     <execution>
@@ -408,87 +498,76 @@
 
 
     <profiles>
+        <!-- from http://www.aheritier.net/maven-failsafe-sonar-and-jacoco-are-in-a-boat/ -->
         <profile>
-            <id>jenkins</id>
+            <id>coverage</id>
             <activation>
+                <!-- activate automatically when built on Jenkins build server -->
                 <property>
-                    <name>env.JENKINS_URL</name>
+                    <name>env.CI</name>
                 </property>
             </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.sonarsource.java</groupId>
+                    <artifactId>sonar-jacoco-listeners</artifactId>
+                    <version>${version.sonar-jacoco-listeners}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
 
             <build>
                 <plugins>
                     <plugin>
-                        <!-- OWASP dependency-check http://jeremylong.github.io/DependencyCheck/index.html -->
-                        <groupId>org.owasp</groupId>
-                        <artifactId>dependency-check-maven</artifactId>
-                        <version>${version.dependency.check.maven}</version>
-                        <dependencies>
-                            <!-- driver for central dependency-check database -->
-                            <dependency>
-                                <groupId>org.mariadb.jdbc</groupId>
-                                <artifactId>mariadb-java-client</artifactId>
-                                <version>${version.dependency-check.mariadb}</version>
-                            </dependency>
-                        </dependencies>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <inherited>true</inherited>
                         <configuration>
-                            <autoUpdate>false</autoUpdate>
-                            <databaseDriverName>org.mariadb.jdbc.Driver</databaseDriverName>
-                            <!-- these properties are set on jenkins -->
-                            <connectionString>${dependency-check.connectionString}</connectionString>
-                            <databaseUser>${dependency-check.databaseUser}</databaseUser>
-                            <databasePassword>${dependency-check.databasePassword}</databasePassword>
-
-                            <skipProvidedScope>true</skipProvidedScope>
-                            <skipTestScope>true</skipTestScope>
-                            <skipRuntimeScope>false</skipRuntimeScope>
-                            <skipSystemScope>true</skipSystemScope>
-                            <format>${dependency-check-format}</format>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                            <failOnError>false</failOnError>
+                            <reportsDirectory>${sonar.junit.reportPaths}</reportsDirectory>
+                            <properties>
+                                <property>
+                                    <name>listener</name>
+                                    <value>org.sonar.java.jacoco.JUnitListener</value>
+                                </property>
+                            </properties>
+                            <argLine>${argLineTestExec} ${jacoco.agent.argLine}</argLine>
                         </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>${version.maven.dependency.plugin}</version>
-                        <executions>
-                            <execution>
-                                <id>dependency-tree</id>
-                                <goals>
-                                    <goal>tree</goal>
-                                </goals>
-                                <phase>validate</phase>
-                                <configuration>
-                                    <appendOutput>true</appendOutput>
-                                    <outputFile>${project.build.directory}/dependency.tree.txt</outputFile>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <!-- http://maven.apache.org/surefire/maven-surefire-report-plugin/ -->
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-report-plugin</artifactId>
-                        <version>${version.maven.surefire.plugin}</version>
                     </plugin>
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>${version.maven.jacoco.plugin}</version>
+                        <configuration>
+                            <excludes>
+                                <!-- exclude javassist classes (leads to runtime exception in coverage) -->
+                                <!-- see http://docs.sonarqube.org/display/PLUG/JaCoCo+Plugin for
+                                    more information -->
+                                <exclude>*_javassist_*</exclude>
+                                <exclude>org.springframework.*</exclude>
+                            </excludes>
+                        </configuration>
                         <executions>
+                            <!-- Unit tests -->
                             <execution>
+                                <id>pre-unit-test</id>
                                 <goals>
                                     <goal>prepare-agent</goal>
                                 </goals>
+                                <phase>initialize</phase>
+                                <configuration>
+                                    <!-- JaCoCo runtime agent for surefire-plugin -->
+                                    <propertyName>jacoco.agent.argLine</propertyName>
+                                    <append>true</append>
+                                </configuration>
                             </execution>
                             <execution>
-                                <id>report</id>
-                                <phase>test</phase>
+                                <id>post-unit-test</id>
                                 <goals>
                                     <goal>report</goal>
-                                    <goal>report-aggregate</goal>
                                 </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -496,140 +575,123 @@
             </build>
         </profile>
 
-        <!-- **************************************************************************************************** -->
-
         <profile>
-            <id>release-only</id>
+            <id>attachSourceAndJavaDoc</id>
             <activation>
+                <!-- activate automatically when built on Jenkins build server -->
                 <property>
-                    <!-- activates on `mvn release:prepare` and `mvn release:perform` see maven-release-plugin config -->
-                    <name>prepareAndPerformRelease</name>
+                    <name>env.CI</name>
                 </property>
             </activation>
-
-            <properties>
-                <!-- This is used in conjunction with the lombok-maven-plugin to generate delomboked sources, -->
-                <!-- effectively this switches the default sourceDirectory with the delomboked version. -->
-                <source.directory>target/generated-sources/delombok</source.directory>
-                <source.test.directory>target/generated-test-sources/delombok</source.test.directory>
-            </properties>
-
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok-maven-plugin</artifactId>
-                        <version>${version.maven.lombok.plugin}</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                                <version>${version.lombok}</version>
-                            </dependency>
-                        </dependencies>
-                        <executions>
-                            <execution>
-                                <id>delombok</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>delombok</goal>
-                                </goals>
-                                <configuration>
-                                    <addOutputDirectory>false</addOutputDirectory>
-                                    <sourceDirectory>src/main/java</sourceDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>test-delombok</id>
-                                <phase>generate-test-sources</phase>
-                                <goals>
-                                    <goal>testDelombok</goal>
-                                </goals>
-                                <configuration>
-                                    <addOutputDirectory>false</addOutputDirectory>
-                                    <sourceDirectory>src/test/java</sourceDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
-                        <groupId>net.revelc.code.formatter</groupId>
-                        <artifactId>formatter-maven-plugin</artifactId>
-                        <version>${version.maven.formatter.plugin}</version>
-                        <configuration>
-                            <configFile>${formatter-path}/formatter.xml</configFile>
-                            <lineEnding>LF</lineEnding>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>validate main sources and test sources</id>
-                                <goals>
-                                    <!-- make sure that no unformatted code is released -->
-                                    <goal>validate</goal>
-                                </goals>
-                                <configuration>
-                                    <!-- delomboked sources do not conform to the formatter and use of the -->
-                                    <!-- lombok plugin changes sourceDirectory and testSourceDirectory -->
-                                    <sourceDirectory>src/main/java</sourceDirectory>
-                                    <testSourceDirectory>src/test/java</testSourceDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>format delomboked source code</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <!-- this should format the generated delomboked source code -->
-                                    <goal>format</goal>
-                                </goals>
-                                <configuration>
-                                    <!-- delomboked sources do not conform to the formatter and use of the -->
-                                    <!-- lombok plugin changes sourceDirectory and testSourceDirectory -->
-                                    <sourceDirectory>${source.directory}</sourceDirectory>
-                                    <testSourceDirectory>${source.test.directory}</testSourceDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>${version.maven.source.plugin}</version>
                         <executions>
+                            <!-- http://stackoverflow.com/questions/4251488/maven-release-plugin-fails-source-artifacts-getting-deployed-twice -->
+                            <!-- This id must match the -Prelease-profile id value or else sources
+								will be "uploaded" twice, which cause Nexus to fail -->
                             <execution>
                                 <id>attach-sources</id>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
+                                <id>attach-sources-new</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
-
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${version.maven.javadoc.plugin}</version>
+                        <inherited>true</inherited>
+                        <configuration>
+                            <quiet>true</quiet>
+                            <detectJavaApiLink>false</detectJavaApiLink>
+                        </configuration>
                         <executions>
                             <execution>
-                                <id>attach-javadoc</id>
+                                <id>attach-javadocs</id>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <additionalOptions>-Xdoclint:none</additionalOptions>
-                            <source>${maven.compiler.source}</source>
-                        </configuration>
                     </plugin>
-
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>require-upper-bound-deps</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
                     <plugin>
-                        <groupId>org.sonarsource.scanner.maven</groupId>
-                        <artifactId>sonar-maven-plugin</artifactId>
-                        <version>${version.sonar.maven.plugin}</version>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>require-upper-bound-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireUpperBoundDeps />
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
-
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>SignAndDeploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <excludeArtifacts>
+                                <excludeArtifact>panstar-sdk-classpath-test</excludeArtifact>
+                            </excludeArtifacts>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>deploy-artifacts</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>publish</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
